@@ -1,7 +1,17 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// --- LOGICA DE CARGA DE PROPIEDADES (Faltaba esto) ---
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -10,15 +20,14 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        // AÑADIR ESTO: Habilita el soporte para librerías de Java 8+
         isCoreLibraryDesugaringEnabled = true
-        
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // Corrección de advertencia: Migración de jvmTarget
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17" 
     }
 
     defaultConfig {
@@ -27,21 +36,33 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
-        // AÑADIR ESTO: Útil para evitar errores de límite de métodos al usar muchas dependencias
         multiDexEnabled = true 
     }
 
+    signingConfigs {
+        // Usamos getProperty para evitar errores si el archivo no existe
+        create("release") {
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) }
+            storePassword = keystoreProperties.getProperty("storePassword")
+        }
+    }
+
     buildTypes {
-        release {
+        getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
+        }
+
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
+            // Eliminamos isZipAlignEnabled por estar deprecated (AGP lo hace solo ahora)
         }
     }
 }
 
-// AÑADIR ESTA SECCIÓN DE DEPENDENCIAS AL FINAL
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
