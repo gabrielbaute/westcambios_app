@@ -1,17 +1,15 @@
 // lib/ui/pages/calculator_page.dart
-import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:client_app/models/enums.dart';
+import 'package:client_app/utils/share_helper.dart';
 import 'package:client_app/services/calc_service.dart';
 import 'package:client_app/ui/themes/west_themes.dart';
 import 'package:client_app/ui/components/calculator/rate_header.dart';
 import 'package:client_app/ui/components/navigation/calculator_actions.dart';
 import 'package:client_app/ui/components/calculator/currency_input_card.dart';
+import 'package:client_app/ui/components/calculator/whatsapp_button.dart';
 
 class CalculatorPage extends StatefulWidget {
   final CalcService calcService;
@@ -100,8 +98,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
     });
   }
 
-  // Función para copiar texto (Estilo formal/claro)
-  void _copyToClipboard() {
+  void _handleCopy() {
     final text =
         """
 💰 *WestCambios - Cotización*
@@ -112,89 +109,90 @@ Ref: ${_usdController.text} \$
 ----------------------------
 Tasa: ${widget.calcService.brlToVesRate}
 """;
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Cotización copiada al portapapeles")),
-    );
+
+    ShareHelper.copyToClipboard(text).then((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Cotización copiada al portapapeles")),
+        );
+      }
+    });
   }
 
-  // Función para capturar y compartir imagen
-  Future<void> _shareScreenshot() async {
-    // Capturamos el widget
-    final image = await _screenshotController.capture();
-    if (image == null) return;
-
-    // Guardamos temporalmente
-    final directory = await getTemporaryDirectory();
-    final imagePath = await File('${directory.path}/cotizacion.png').create();
-    await imagePath.writeAsBytes(image);
-
-    // Compartimos el archivo
-    await Share.shareXFiles([
-      XFile(imagePath.path),
-    ], text: 'Mi cotización en WestCambios');
+  Future<void> _handleShare() async {
+    await ShareHelper.shareScreenshot(_screenshotController);
   }
 
   @override
   Widget build(BuildContext context) {
-    // 5. VISTA DE CARGA: Si aún no hay datos, mostramos un spinner
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
+
     return Scaffold(
-      body: Screenshot(
-        controller: _screenshotController,
-        child: Container(
-          color: WestColors.whiteBone,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Header con las tasas obtenidas del servicio
-                RateHeader(
-                  brlRate: widget.calcService.brlToVesRate,
-                  usdRate: widget.calcService.usdToVesRate,
-                ),
+      backgroundColor: WestColors.whiteBone,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          children: [
+            // NIVEL 1: Llamado a la acción (WhatsApp)
+            const WhatsappButton(),
 
-                const SizedBox(height: 10),
+            const SizedBox(height: 15),
 
-                // Input de Reales (Naranja)
-                CurrencyInputCard(
-                  label: "Envías Reales",
-                  currencyCode: "R\$",
-                  badgeColor: const Color(0xFFFF6B00),
-                  controller: _brlController,
-                  focusNode: _brlFocus,
-                  onChanged: _onCalculate,
+            // NIVEL 2: Área de captura (Screenshot)
+            // Solo envuelve lo que el cliente final debe ver en la foto
+            Screenshot(
+              controller: _screenshotController,
+              child: Container(
+                color:
+                    WestColors.whiteBone, // Asegura fondo sólido en la captura
+                child: Column(
+                  children: [
+                    RateHeader(
+                      brlRate: widget.calcService.brlToVesRate,
+                      usdRate: widget.calcService.usdToVesRate,
+                    ),
+                    const SizedBox(height: 10),
+                    CurrencyInputCard(
+                      label: "Envías Reales",
+                      currencyCode: "R\$",
+                      badgeColor: const Color(0xFFFF6B00),
+                      controller: _brlController,
+                      focusNode: _brlFocus,
+                      onChanged: _onCalculate,
+                    ),
+                    CurrencyInputCard(
+                      label: "Reciben Bolívares",
+                      currencyCode: "Bs",
+                      badgeColor: const Color(0xFF28A745),
+                      controller: _vesController,
+                      focusNode: _vesFocus,
+                      onChanged: _onCalculate,
+                    ),
+                    CurrencyInputCard(
+                      label: "Referencia en Dólares",
+                      currencyCode: "\$",
+                      badgeColor: const Color(0xFF007BFF),
+                      controller: _usdController,
+                      focusNode: _usdFocus,
+                      onChanged: _onCalculate,
+                    ),
+                  ],
                 ),
-
-                // Input de Bolívares (Verde)
-                CurrencyInputCard(
-                  label: "Reciben Bolívares",
-                  currencyCode: "Bs",
-                  badgeColor: const Color(0xFF28A745),
-                  controller: _vesController,
-                  focusNode: _vesFocus,
-                  onChanged: _onCalculate,
-                ),
-
-                // Input de Dólares (Azul - Referencia)
-                CurrencyInputCard(
-                  label: "Referencia en Dólares",
-                  currencyCode: "\$",
-                  badgeColor: const Color(0xFF007BFF),
-                  controller: _usdController,
-                  focusNode: _usdFocus,
-                  onChanged: _onCalculate,
-                ),
-                // Agregamos las acciones al final
-                CalculatorActions(
-                  onCopyText: _copyToClipboard,
-                  onShareScreenshot: _shareScreenshot,
-                ),
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
-          ),
+
+            const SizedBox(height: 10),
+
+            // NIVEL 3: Acciones de Utilidad (Fuera del screenshot)
+            CalculatorActions(
+              onCopyText: _handleCopy,
+              onShareScreenshot: _handleShare,
+            ),
+
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
