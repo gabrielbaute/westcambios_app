@@ -10,6 +10,7 @@ class CalcService {
   RateResponse? _brlRate;
   RateResponse? _usdRate;
   RateResponse? _usdtRate;
+  RateResponse? _usdtToBrlRate;
 
   CalcService({required ApiClient apiClient}) : _apiClient = apiClient;
 
@@ -23,12 +24,14 @@ class CalcService {
         _apiClient.getLatestBrlRate(),
         _apiClient.getLatestUsdRate(),
         _apiClient.getLatestUsdtRate(),
+        _apiClient.getLatestUsdtToBrlRate(),
       ]);
 
       // Asignamos los resultados (el orden coincide con el de la lista en Future.wait)
       _brlRate = results[0];
       _usdRate = results[1];
       _usdtRate = results[2];
+      _usdtToBrlRate = results[3];
     } catch (e) {
       // En un entorno de ingeniería, aquí podrías implementar un sistema de logs
       rethrow;
@@ -39,6 +42,7 @@ class CalcService {
   double get brlToVesRate => _brlRate?.rate ?? 0.0;
   double get usdToVesRate => _usdRate?.rate ?? 0.0;
   double get usdtToVesRate => _usdtRate?.rate ?? 0.0;
+  double get usdtToBrlRate => _usdtToBrlRate?.rate ?? 0.0;
 
   /// Realiza la conversión de Bolívares a Dólares basada en la tasa actual.
   ///
