@@ -9,6 +9,7 @@ class CalcService {
   // Propiedades privadas para almacenar el estado actual de las tasas
   RateResponse? _brlRate;
   RateResponse? _usdRate;
+  RateResponse? _usdtRate;
 
   CalcService({required ApiClient apiClient}) : _apiClient = apiClient;
 
@@ -17,15 +18,17 @@ class CalcService {
   /// optimizando el tiempo de respuesta de la red.
   Future<void> refreshRate() async {
     try {
-      // Ejecutamos ambas peticiones de forma concurrente
+      // Ejecutamos las tres peticiones de forma concurrente
       final results = await Future.wait([
         _apiClient.getLatestBrlRate(),
         _apiClient.getLatestUsdRate(),
+        _apiClient.getLatestUsdtRate(),
       ]);
 
       // Asignamos los resultados (el orden coincide con el de la lista en Future.wait)
       _brlRate = results[0];
       _usdRate = results[1];
+      _usdtRate = results[2];
     } catch (e) {
       // En un entorno de ingeniería, aquí podrías implementar un sistema de logs
       rethrow;
@@ -35,6 +38,7 @@ class CalcService {
   // Getters con tipado explícito
   double get brlToVesRate => _brlRate?.rate ?? 0.0;
   double get usdToVesRate => _usdRate?.rate ?? 0.0;
+  double get usdtToVesRate => _usdtRate?.rate ?? 0.0;
 
   /// Realiza la conversión de Bolívares a Dólares basada en la tasa actual.
   ///
