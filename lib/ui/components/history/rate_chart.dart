@@ -13,7 +13,11 @@ class RateChart extends StatelessWidget {
     if (rates.isEmpty)
       return const SizedBox(
         height: 200,
-        child: Center(child: Text("Sin datos")),
+        child: Center(
+          child: Text(
+            "No pudimos conectarnos a nuestro servidor, por favor intenta más tarde!",
+          ),
+        ),
       );
 
     return AspectRatio(
@@ -35,7 +39,7 @@ class RateChart extends StatelessWidget {
             lineBarsData: [
               LineChartBarData(
                 spots: rates.asMap().entries.map((e) {
-                  return FlSpot(e.key.toDouble(), e.value.rate);
+                  return FlSpot(e.key.toDouble().roundToDouble(), e.value.rate);
                 }).toList(),
                 isCurved: true,
                 gradient: const LinearGradient(
