@@ -36,6 +36,30 @@ class RateChart extends StatelessWidget {
               show: false,
             ), // Por ahora simple, luego añadimos ejes
             borderData: FlBorderData(show: false),
+            lineTouchData: LineTouchData(
+              touchTooltipData: LineTouchTooltipData(
+                // 1. Color de fondo del recuadro
+                getTooltipColor: (touchedSpot) =>
+                    WestColors.whiteBone.withValues(alpha: 0.4),
+                tooltipBorderRadius: const BorderRadius.all(
+                  Radius.circular(12),
+                ),
+                getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                  return touchedBarSpots.map((barSpot) {
+                    return LineTooltipItem(
+                      // 2. Personalización del texto (Capa de ingeniería: Formateo de moneda)
+                      'Bs ${barSpot.y.toStringAsFixed(2)}',
+                      const TextStyle(
+                        color: WestColors
+                            .orangePrimary, // Texto en naranja de la marca
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    );
+                  }).toList();
+                },
+              ),
+            ),
             lineBarsData: [
               LineChartBarData(
                 spots: rates.asMap().entries.map((e) {
@@ -52,8 +76,8 @@ class RateChart extends StatelessWidget {
                   show: true,
                   gradient: LinearGradient(
                     colors: [
-                      WestColors.orangePrimary.withOpacity(0.3),
-                      WestColors.orangePrimary.withOpacity(0.0),
+                      WestColors.orangePrimary.withValues(alpha: 0.4),
+                      WestColors.orangePrimary.withValues(alpha: 0.0),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
