@@ -87,7 +87,9 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                 ),
               ),
-              SliverToBoxAdapter(child: RateChart(rates: filteredRates)),
+              SliverToBoxAdapter(
+                child: RateChart(rates: filteredRates.reversed.toList()),
+              ),
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
