@@ -152,6 +152,8 @@ Tasa: ${widget.calcService.brlToVesRate}
                     RateHeader(
                       brlRate: widget.calcService.brlToVesRate,
                       usdRate: widget.calcService.usdToVesRate,
+                      usdtRate: widget.calcService.usdtToVesRate,
+                      usdtBrlRate: widget.calcService.usdtToBrlRate,
                     ),
                     const SizedBox(height: 10),
                     CurrencyInputCard(
