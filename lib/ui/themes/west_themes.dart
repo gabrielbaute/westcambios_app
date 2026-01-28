@@ -4,7 +4,7 @@ class WestColors {
   // Colores extraídos del CSS del cliente
   static const Color orangePrimary = Color(0xFFFF6B00);
   static const Color orangeLight = Color(0xFFFF8C42);
-  static const Color orangeSoft = Color(0xFFFFF3EB);
+  static const Color orangeSoft = Color(0xFFFFBC8F);
   static const Color whitePure = Color(0xFFFFFFFF);
   static const Color whiteBone = Color(0xFFF8F9FA);
   static const Color grayDark = Color(0xFF333333);
