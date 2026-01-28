@@ -20,10 +20,10 @@ class RateHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     // Usamos un SizedBox para darle una altura finita al scroll horizontal
     return SizedBox(
-      height: 100, // Ajusta esta altura según el diseño de tu RateCardItem
+      height: 115, // Ajusta esta altura según el diseño de tu RateCardItem
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
           RateCardItem(
             label: "Tasa del día",

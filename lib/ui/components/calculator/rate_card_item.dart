@@ -16,49 +16,53 @@ class RateCardItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: WestColors.whitePure,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: WestColors.orangeSoft, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: WestColors.orangePrimary.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    return Container(
+      width: 140,
+      // Bajamos el padding para ganar espacio interno
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [WestColors.orangePrimary, WestColors.orangeSoft],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 16, color: WestColors.orangePrimary),
-                const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: WestColors.grayDark,
-                  ),
-                ),
-              ],
+        borderRadius: BorderRadius.circular(12), // Un poco menos de radio
+        boxShadow: [
+          BoxShadow(
+            color: WestColors.orangePrimary.withValues(alpha: 0.2),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        // Quitamos MainAxisAlignment.center para evitar empujes innecesarios
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: Colors.white,
+            size: 18,
+          ), // Icono ligeramente más pequeño
+          const SizedBox(height: 4), // Menos espacio
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
+          ),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15, // Un punto menos para asegurar cabida
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: WestColors.orangePrimary,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
