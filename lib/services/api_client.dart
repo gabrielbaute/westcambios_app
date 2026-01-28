@@ -95,7 +95,10 @@ class ApiClient {
 
   /// Obtiene la tasa más reciente para una moneda específica (Base -> VES)
   /// Filtra la lista de hoy para encontrar el registro pertinente.
-  Future<RateResponse?> getLatestRateFor(Currency fromCurrency) async {
+  Future<RateResponse?> getLatestRateFor(
+    Currency fromCurrency,
+    Currency toCurrency,
+  ) async {
     try {
       final RateListResponse dailyRates = await getTodayRates();
 
@@ -104,7 +107,7 @@ class ApiClient {
       return dailyRates.rates.cast<RateResponse?>().firstWhere(
         (rate) =>
             rate?.fromCurrency == fromCurrency &&
-            rate?.toCurrency == Currency.VES,
+            rate?.toCurrency == toCurrency,
         orElse: () => null,
       );
     } catch (e) {
@@ -114,13 +117,20 @@ class ApiClient {
   }
 
   /// Método específico para BRL -> VES (Tasa WestCambios)
-  Future<RateResponse?> getLatestBrlRate() => getLatestRateFor(Currency.BRL);
+  Future<RateResponse?> getLatestBrlRate() =>
+      getLatestRateFor(Currency.BRL, Currency.VES);
 
   /// Método específico para USD -> VES (Tasa BCV/Referencia)
-  Future<RateResponse?> getLatestUsdRate() => getLatestRateFor(Currency.USD);
+  Future<RateResponse?> getLatestUsdRate() =>
+      getLatestRateFor(Currency.USD, Currency.VES);
 
   /// Método específico para USDT -> VES (Tasa Binance/P2P)
-  Future<RateResponse?> getLatestUsdtRate() => getLatestRateFor(Currency.USDT);
+  Future<RateResponse?> getLatestUsdtRate() =>
+      getLatestRateFor(Currency.USDT, Currency.VES);
+
+  /// Método específico para USDT -> BRL (Tasa Binance/P2P)
+  Future<RateResponse?> getLatestUsdtToBrlRate() =>
+      getLatestRateFor(Currency.USDT, Currency.BRL);
 
   /// Obtener tasas de la ultima semana (Exchange Rates) - No requiere auth
   Future<RateListResponse> getWeekRates() async {
