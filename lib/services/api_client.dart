@@ -119,6 +119,9 @@ class ApiClient {
   /// Método específico para USD -> VES (Tasa BCV/Referencia)
   Future<RateResponse?> getLatestUsdRate() => getLatestRateFor(Currency.USD);
 
+  /// Método específico para USDT -> VES (Tasa Binance/P2P)
+  Future<RateResponse?> getLatestUsdtRate() => getLatestRateFor(Currency.USDT);
+
   /// Obtener tasas de la ultima semana (Exchange Rates) - No requiere auth
   Future<RateListResponse> getWeekRates() async {
     final response = await http.get(
